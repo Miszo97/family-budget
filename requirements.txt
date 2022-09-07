@@ -3,3 +3,6 @@ psycopg2>=2.8
 python-decouple>=3.6
 djangorestframework
 django-filter
+djangorestframework-simplejwt
+pytest-django
+pytest
