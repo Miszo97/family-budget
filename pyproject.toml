@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "family-budget"
+version = "0.1.0"
+description = "API for family budget application"
+authors = ["Artur"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "family_budget"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Django = "^4.1.1"
+djangorestframework = "^3.13.1"
+psycopg2 = "^2.9.3"
+python-decouple = "^3.6"
+django-filter = "^22.1"
+djangorestframework-simplejwt = "^5.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
