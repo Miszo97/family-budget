@@ -9,6 +9,9 @@ class BudgetViewSet(viewsets.ModelViewSet):
     """
     ViewSet for viewing and editing budgets.
     """
-    queryset = Budget.objects.all()
     serializer_class = BudgetSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Budget.objects.filter(author=user)

@@ -5,7 +5,7 @@ from budget.views import BudgetViewSet
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register(r'me/budget', BudgetViewSet, basename='budget')
+router.register(r'me/budgets', BudgetViewSet, basename='budget')
 urlpatterns = router.urls
 
 urlpatterns = [

@@ -1,29 +1,32 @@
 from rest_framework import status
 import pytest
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.test import APIClient
+from budget.enums import ExpenseCategory
+from budget.models import Budget
 
 pytestmark = pytest.mark.django_db
 
 
-@pytest.fixture
-def user(django_user_model):
-    user = django_user_model.objects.create_user(username='john')
-    return user
-
-
-@pytest.fixture
-def api_client(user):
-    client = APIClient()
-    refresh = RefreshToken.for_user(user)
-    client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
-
-    return client
-
-
 def test_user_can_create_budget(api_client, django_user_model, user):
-    shared_account = django_user_model.objects.create_user(username='ala')
-    data = {"name": "admin", "author": user.pk, "shared_account": [shared_account.pk], "income": 1000,
-            "expenses": [{"amount": 100, "category": "HOME"}]}
-    response = api_client.post("/user/me/budget/", data=data)
+    shared_account_1 = django_user_model.objects.create_user(username='ala')
+    shared_account_2 = django_user_model.objects.create_user(username='ola')
+    data = {"name": "admin", "author": user.pk, "shared_account": [shared_account_1.pk, shared_account_2.pk], "income": 1000,
+            "expenses": [{"amount": 100, "category": ExpenseCategory.EDUCATION}]}
+    response = api_client.post("/api/users/me/budgets/", data, format='json')
     assert response.status_code == status.HTTP_201_CREATED
+
+def test_user_can_see_their_budgets(api_client, user):
+    budget_1 = Budget.objects.create(name="Hawaii", author=user, income=1000)
+    budget_2 = Budget.objects.create(name="Sydney", author=user, income=1000)
+
+    response = api_client.get("/api/users/me/budgets/")
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.data) == 2
+
+def test_user_cannot_see_other_user_budgets(api_client, django_user_model):
+    ola_user = django_user_model.objects.create_user(username='Ola')
+    budget = Budget.objects.create(name="Hawaii", author=ola_user, income=1000)
+
+    response = api_client.get("/api/users/me/budgets/")
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.data) == 0
