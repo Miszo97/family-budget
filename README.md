@@ -1,4 +1,4 @@
-# family-budget
+# 👨‍👩‍👧‍👦 family-budget
 API for the family budget application
 
 # Installation 
