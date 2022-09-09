@@ -1,13 +1,12 @@
 from django.urls import path
-from user import views
-from budget.views import BudgetViewSet
-
 from rest_framework.routers import DefaultRouter
+
+from budget.views import BudgetViewSet
+from user import views
 
 router = DefaultRouter()
 router.register(r"me/budgets", BudgetViewSet, basename="budgets")
 router.register(r"me/shared-budgets", BudgetViewSet, basename="shared-budgets")
-
 
 urlpatterns = router.urls
 

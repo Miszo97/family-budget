@@ -1,8 +1,9 @@
-from rest_framework import status
 import pytest
+from django.urls import reverse
+from rest_framework import status
+
 from budget.enums import ExpenseCategory
 from budget.models import Budget
-from django.urls import reverse
 
 pytestmark = pytest.mark.django_db
 
@@ -59,4 +60,3 @@ def test_user_cannot_share_budget_with_him_self(api_client, user):
             "expenses": [{"amount": 100, "category": ExpenseCategory.EDUCATION}]}
     response = api_client.post(reverse("budgets-list"), data, format='json')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-
