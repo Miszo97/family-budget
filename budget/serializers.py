@@ -1,11 +1,6 @@
 from rest_framework import serializers
 from budget.models import Budget, Expense
-
-
-class ExpenseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Expense
-        fields = ["id", "budget", "amount"]
+from codes import Code
 
 
 class BudgetInputExpenseSerializer(serializers.ModelSerializer):
@@ -24,24 +19,29 @@ class BudgetSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "author",
-            "shared_account",
+            "shared_accounts",
             "income",
             "created_at",
             "expenses",
         ]
 
+    def validate_shared_accounts(self, shared_accounts):
+        if self.context['request'].user in shared_accounts:
+            raise serializers.ValidationError({"code": Code.SELF_SHARE.name, "details": Code.SELF_SHARE.value})
+        return shared_accounts
+
     def create(self, validated_data):
         expenses = validated_data.pop("expenses", None)
-        shared_account = validated_data.pop("shared_account", None)
+        shared_accounts = validated_data.pop("shared_accounts", None)
 
         budget = Budget.objects.create(**validated_data)
-        
-        if shared_account:
-            for s_a in shared_account:
-                    budget.shared_account.add(s_a)
-        
+
+        if shared_accounts:
+            for s_a in shared_accounts:
+                budget.shared_accounts.add(s_a)
+
         if expenses:
-            for exepnse in expenses:
-                Expense.objects.create(budget=budget, **exepnse)
+            for expense in expenses:
+                Expense.objects.create(budget=budget, **expense)
 
         return budget
