@@ -7,7 +7,7 @@
         "author": 1,
         "income": "1000.0000000000",
         "created_at": "2022-09-08T17:01:59.765Z",
-        "shared_account": [
+        "shared_accounts": [
             2,
             3,
             4
@@ -22,7 +22,7 @@
         "author": 1,
         "income": "1000.0000000000",
         "created_at": "2022-09-08T17:05:16.161Z",
-        "shared_account": [
+        "shared_accounts": [
             4,
             5
         ]
