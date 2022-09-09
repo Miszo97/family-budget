@@ -25,6 +25,16 @@ class BudgetSerializer(serializers.ModelSerializer):
             "created_at",
             "expenses",
         ]
+        extra_kwargs = {
+            "shared_accounts": {
+                "required": False,
+            },
+        }
+
+    def validate_income(self, income):
+        if income < 0:
+            raise serializers.ValidationError({"code": Code.NEGATIVE_INCOME.name, "details": Code.NEGATIVE_INCOME.value})
+        return income
 
     def validate_shared_accounts(self, shared_accounts):
         if self.context['request'].user in shared_accounts:

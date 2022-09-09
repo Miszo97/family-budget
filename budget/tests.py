@@ -9,10 +9,14 @@ pytestmark = pytest.mark.django_db
 
 
 def test_unauthenticated_user_cannot_create_budget(client, user):
-    data = {"name": "admin", "author": user.pk,
-            "income": 1000,
-            "expenses": [{"amount": 100, "category": ExpenseCategory.EDUCATION}]}
-    response = client.post(reverse("budgets-list"), data, format='json')
+    data = {
+        "name": "admin",
+        "author": user.pk,
+        "income": 1000,
+        "expenses": [{"amount": 100, "category": ExpenseCategory.EDUCATION}],
+    }
+
+    response = client.post(reverse("budgets-list"), data, format="json")
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
@@ -22,13 +26,31 @@ def test_unauthenticated_user_cannot_get_budget(client):
 
 
 def test_user_can_create_budget(api_client, django_user_model, user):
-    shared_account_1 = django_user_model.objects.create_user(username='ala')
-    shared_account_2 = django_user_model.objects.create_user(username='ola')
-    data = {"name": "admin", "author": user.pk, "shared_accounts": [shared_account_1.pk, shared_account_2.pk],
-            "income": 1000,
-            "expenses": [{"amount": 100, "category": ExpenseCategory.EDUCATION}]}
-    response = api_client.post(reverse("budgets-list"), data, format='json')
+    shared_account_1 = django_user_model.objects.create_user(username="ala")
+    shared_account_2 = django_user_model.objects.create_user(username="ola")
+
+    data = {
+        "name": "admin",
+        "author": user.pk,
+        "shared_accounts": [shared_account_1.pk, shared_account_2.pk],
+        "income": 1000,
+        "expenses": [{"amount": 100, "category": ExpenseCategory.EDUCATION}],
+    }
+
+    response = api_client.post(reverse("budgets-list"), data, format="json")
     assert response.status_code == status.HTTP_201_CREATED
+
+
+def test_user_provides_negative_income(api_client, django_user_model, user):
+    data = {
+        "name": "admin",
+        "author": user.pk,
+        "income": -1000,
+        "expenses": [{"amount": 100, "category": ExpenseCategory.EDUCATION}],
+    }
+
+    response = api_client.post(reverse("budgets-list"), data, format="json")
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 def test_user_can_get_their_budgets(api_client, user):
@@ -50,7 +72,7 @@ def test_user_can_filter_their_budgets(api_client, user):
 
 
 def test_user_cannot_get_other_user_budgets(api_client, django_user_model):
-    ola_user = django_user_model.objects.create_user(username='Ola')
+    ola_user = django_user_model.objects.create_user(username="Ola")
     Budget.objects.create(name="Hawaii", author=ola_user, income=1000)
 
     response = api_client.get(reverse("budgets-list"))
@@ -59,17 +81,23 @@ def test_user_cannot_get_other_user_budgets(api_client, django_user_model):
 
 
 def test_user_can_get_budgets_he_share(api_client, django_user_model, user):
-    ola_user = django_user_model.objects.create_user(username='Ola')
+    ola_user = django_user_model.objects.create_user(username="Ola")
     budget = Budget.objects.create(name="Hawaii", author=ola_user, income=1000)
     budget.shared_accounts.add(user)
+
     response = api_client.get(reverse("shared-budgets-list"))
     assert response.status_code == status.HTTP_200_OK
     assert response.data["count"] == 1
 
 
 def test_user_cannot_share_budget_with_him_self(api_client, user):
-    data = {"name": "admin", "author": user.pk, "shared_accounts": [user.pk],
-            "income": 1000,
-            "expenses": [{"amount": 100, "category": ExpenseCategory.EDUCATION}]}
-    response = api_client.post(reverse("budgets-list"), data, format='json')
+    data = {
+        "name": "admin",
+        "author": user.pk,
+        "shared_accounts": [user.pk],
+        "income": 1000,
+        "expenses": [{"amount": 100, "category": ExpenseCategory.EDUCATION}],
+    }
+
+    response = api_client.post(reverse("budgets-list"), data, format="json")
     assert response.status_code == status.HTTP_400_BAD_REQUEST
