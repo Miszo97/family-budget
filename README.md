@@ -17,6 +17,11 @@ cp .env_example .env
 docker-compose up
 ```
 
+### Run migrations
+```
+docker-compose exec web poetry run python manage.py migrate
+```
+
 ### You can load fixtures
 ```
 docker-compose exec web poetry run python manage.py loaddata fixtures/*
