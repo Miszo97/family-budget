@@ -67,7 +67,7 @@ with pagination
 curl --location --request GET 'http://localhost:8000/api/users/me/budgets/?offset=0&limit=10' \
 --header 'Authorization: Bearer YOUR_API_KEY'
 ```
-you can also filter your result by name
+you can also filter your result by a name
 ```
 curl --location --request GET 'http://localhost:8000/api/users/me/budgets/?name=Budget \
 --header 'Authorization: Bearer YOUR_API_KEY'
