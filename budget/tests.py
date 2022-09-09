@@ -8,6 +8,19 @@ from budget.models import Budget
 pytestmark = pytest.mark.django_db
 
 
+def test_unauthenticated_user_cannot_create_budget(client, user):
+    data = {"name": "admin", "author": user.pk,
+            "income": 1000,
+            "expenses": [{"amount": 100, "category": ExpenseCategory.EDUCATION}]}
+    response = client.post(reverse("budgets-list"), data, format='json')
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+def test_unauthenticated_user_cannot_get_budget(client):
+    response = client.get(reverse("budgets-list"))
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
 def test_user_can_create_budget(api_client, django_user_model, user):
     shared_account_1 = django_user_model.objects.create_user(username='ala')
     shared_account_2 = django_user_model.objects.create_user(username='ola')
