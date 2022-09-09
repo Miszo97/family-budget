@@ -10,7 +10,7 @@ cd family-budget
 ```
 ### Set up env file
 ```
-cp ./env_example ./env
+cp .env_example .env
 ````
 ### Build and run cointainers
 ```
@@ -41,7 +41,7 @@ curl --location --request POST 'http://localhost:8000/api/token/' \
 --data-raw '{
     "username": "admin",
     "password": "admin"
-}
+}'
 ```
 
 ### Create a new budget
@@ -50,7 +50,7 @@ curl --location --request POST 'http://localhost:8000/api/users/me/budgets/' \
 --header 'Authorization: Bearer YOUR_ACCESS_KEY \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "name": "Budget",
+    "name": "budget",
     "income": 1000,
     "expenses": [{"amount": 100, "category": "HOME"}, {"amount": 100, "category": "TRAVEL"}, {"amount": 100, "category": "ENTERTAINMENT"}],
     "shared_accounts": [2,5]
