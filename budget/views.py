@@ -6,27 +6,21 @@ from budget.models import Budget
 from budget.serializers import BudgetSerializer
 
 
-class BudgetViewSet(viewsets.ModelViewSet):
+class MyBudgetViewSet(viewsets.ModelViewSet):
     """
-    Base class ViewSet for viewing and editing budgets.
+    ViewSet for viewing and editing budgets of an authenticated user.
     """
     permission_classes = [IsAuthenticated]
     serializer_class = BudgetSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_fields = ("name",)
 
-
-class MyBudgetViewSet(BudgetViewSet):
-    """
-    ViewSet for viewing and editing budgets of an authenticated user.
-    """
-
     def get_queryset(self):
         user = self.request.user
         return Budget.objects.filter(author=user)
 
 
-class MySharedBudgetViewSet(BudgetViewSet):
+class MySharedBudgetViewSet(MyBudgetViewSet):
     """
     ViewSet for viewing and editing shared budgets of an authenticated user.
     """
