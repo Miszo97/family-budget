@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import serializers
 
 from budget.models import Budget, Expense
@@ -33,7 +34,8 @@ class BudgetSerializer(serializers.ModelSerializer):
 
     def validate_income(self, income):
         if income < 0:
-            raise serializers.ValidationError({"code": Code.NEGATIVE_INCOME.name, "details": Code.NEGATIVE_INCOME.value})
+            raise serializers.ValidationError(
+                {"code": Code.NEGATIVE_INCOME.name, "details": Code.NEGATIVE_INCOME.value})
         return income
 
     def validate_shared_accounts(self, shared_accounts):
@@ -45,14 +47,15 @@ class BudgetSerializer(serializers.ModelSerializer):
         expenses = validated_data.pop("expenses", None)
         shared_accounts = validated_data.pop("shared_accounts", None)
 
-        budget = Budget.objects.create(**validated_data)
+        with transaction.atomic():
+            budget = Budget.objects.create(**validated_data)
 
-        if shared_accounts:
-            for s_a in shared_accounts:
-                budget.shared_accounts.add(s_a)
+            if shared_accounts:
+                for s_a in shared_accounts:
+                    budget.shared_accounts.add(s_a)
 
-        if expenses:
-            for expense in expenses:
-                Expense.objects.create(budget=budget, **expense)
+            if expenses:
+                for expense in expenses:
+                    Expense.objects.create(budget=budget, **expense)
 
-        return budget
+            return budget
